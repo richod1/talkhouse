@@ -20,7 +20,7 @@ const userDoc={
     password:encryptPassword,
 }
 
-
+// default user
 const degraftMail=await User.findOne({email:"frimpsup@gmail.com"})
 // saving admin
 
