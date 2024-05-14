@@ -54,3 +54,38 @@ if(degraftMail){
     return res.status(500).json("Error occured at register,Please try again ")
 }
 }
+
+
+// login controller
+const login=async(req,res)=>{
+    try{
+        const {email,password}=req.body;
+        const user=await User.findOne({email:email.toLowercase()})
+        if(!user){
+            return res.status(404).json({message:"User not found!"})
+        }
+
+        const validPassword=await bcrypt.compare(password,user.password)
+        if(!validPassword){
+            return res.status(400).json({
+                message:"Invalid password"
+            })
+        }
+
+        const token=jwt.sign({user:user._id,username:user.username,email},process.env.JWT_SECRET,{expiresIn:"15d"})
+        return res.status(201).json({
+            userDtails:{
+                _id:user._id,
+                username:user.username,
+                email:user.email,
+                token:token
+            }
+        })
+    }catch(err){
+        return res.status(500).jsone({message:"Somthing went wrong"})
+    }
+}
+module.exports={
+    register,
+    login,
+}
