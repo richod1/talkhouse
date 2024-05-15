@@ -10,7 +10,7 @@ const requireAuth=async(req,res,next)=>{
     try{
         token=token.split(" ")[1]
 
-        const decoded=jwt.verify(yoken,process.env.JWT_SECRET);
+        const decoded=jwt.verify(token,process.env.JWT_SECRET);
         req.user=decoded;
     }catch(err){
         return res.status(401).json("Invalid Token")

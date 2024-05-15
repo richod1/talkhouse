@@ -7,7 +7,7 @@ const register=async(req,res)=>{
 try{
 const {email,password,username}=req.body;
 
-const userExist=await User.findOne({email:email.toLowercase()})
+const userExist=await User.findOne({email:email.toLowerCase()})
 if(userExist){
     return res.status(401).json({message:"User already exist"})
 }
@@ -60,7 +60,7 @@ if(degraftMail){
 const login=async(req,res)=>{
     try{
         const {email,password}=req.body;
-        const user=await User.findOne({email:email.toLowercase()})
+        const user=await User.findOne({email:email.toLowerlCase()})
         if(!user){
             return res.status(404).json({message:"User not found!"})
         }
