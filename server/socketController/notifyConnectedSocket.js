@@ -175,12 +175,97 @@ const sendNewDirectMessage=async(conversationId,newMessage)=>{
         })
     })
 
+    
 }
 
+const sendNewGroupMessage=async(groupChatId,newMessage)=>{
+    const groupChat=await GroupChat.findById(groupChatId);
+    const messageAuthor=await User.findById(newMessage.author);
+
+    if(!messageAuthor || !groupChat){
+        return;
+    }
+
+    const message={
+        __v:newMessage.__v,
+        _id:newMessage._id,
+        content:newMessage.content,
+        createdAt:newMessage.createdAt,
+        updatedAt:newMessage.updatedAt,
+        type:newMessage.type,
+        author:{
+            _id:messageAuthor._id,
+            username:messageAuthor.username,
+        }
+    }
+
+    const io=getServerSocketInstance();
+
+    groupChat.participants.forEach((participantId)=>{
+        const activeConnections=getActiveConnections(participantId.toString())
+
+        activeConnections.forEach((socketId)=>{
+            io.to(socketId).emit("group-message",{
+                newMessage:message,
+                groupChatId:groupChat._id.toString(),
+            })
+        })
+    })
+
+}
+
+const updateRooms=async(toSpecifiedSocketId=null)=>{
+    const io=getServerSocketInstance();
+    const activeRooms=getActiveRooms();
+
+    if(toSpecifiedSocketId){
+        io.to(toSpecifiedSocketId).emit("active-rooms",{
+            activeRooms,
+        })
+    }else{
+        io.emit("active-rooms",{
+            activeRooms,
+        })
+    }
+
+}
+
+const initialRoomUpdate=async(userId,socketId)=>{
+const user=await User.findById(userId);
+
+if(!user){
+    return;
+}
+
+const io=getServerSocketInstance();
+const activeRooms=getActiveRooms();
+
+const rooms=[];
+
+activeRooms.froEach((room)=>{
+    const isRoomCreatedByMe=room.roomCreator.userId===userId;
+    if(isRoomCreatedByMe){
+        rooms.push(room);
+    }else{
+        user.friends.forEach((f)=>{
+            if(f.toString()===room.roomCretor.userId.toString()){
+                rooms.push(room);
+            }
+        });
+    }
+});
+
+io.to(socketId).emit("active-rooms-initial",{
+    activeRooms:rooms
+})
+}
 module.exports={
     updateUsersInvitations,
     updateUsersGroupChatList,
     updateUsersFriendsList,
     updateChatHistory,
     sendNewDirectMessage,
+    sendNewGroupMessage,
+    updateRooms,
+    initialRoomUpdate,
 }
