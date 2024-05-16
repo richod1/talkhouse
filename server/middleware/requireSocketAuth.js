@@ -1,8 +1,6 @@
 const jwt=require("jsonwebtoken")
 
 
-
-
 const requiredSocketAuth=(socket,next)=>{
     let token=socket.handshake.auth?.token
 
