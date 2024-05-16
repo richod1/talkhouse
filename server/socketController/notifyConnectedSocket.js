@@ -137,9 +137,50 @@ const updateChatHistory=async(conversationId,toSpecifiedSocketId=null)=>{
     })
 }
 
+// sending direct message to active users
+const sendNewDirectMessage=async(conversationId,newMessage)=>{
+
+    const conversation=await Conversation.findById(conversationId);
+
+    const messageAuthor=await User.findById(newMessage.author);
+
+    if(!messageAuthor||!conversation){
+        return;
+    }
+
+    const message={
+        __v:newMessage.__v,
+        _id:newMessage._id,
+        content:newMessage._content,
+        createdAt:newMessage._createdAt,
+        updatedAt:newMessage.updatedAt,
+        type:newMessage.type,
+        author:{
+            _id:messageAuthor._id,
+            username:messageAuthor.username
+        }
+    };
+
+    const io=getServerSocketInstance();
+
+    // get a participant active socket connection
+    conversation.participants.forEach((participantId)=>{
+        const activeConnections=getActiveConnections(participantId.toString());
+
+        activeConnections.forEach((socketId)=>{
+            io.to(socketId).emit("direct-message",{
+                newMessage:message,
+                participants:conversation.participants
+            })
+        })
+    })
+
+}
+
 module.exports={
     updateUsersInvitations,
     updateUsersGroupChatList,
     updateUsersFriendsList,
     updateChatHistory,
+    sendNewDirectMessage,
 }
