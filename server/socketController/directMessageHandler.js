@@ -41,6 +41,8 @@ const directMessageHandler=async(socket,data)=>{
         console.log(err)
     }
 
-    module.exports=directMessageHandler;
+
 
 }
+
+module.exports=directMessageHandler;
