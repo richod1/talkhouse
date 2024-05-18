@@ -7,7 +7,7 @@ const addNewConnectedUser=({socketId,userId})=>{
 }
 
 
-const removeConneted=({socketId})=>{
+const removeConnetedUser=({socketId})=>{
     if(connectedUsers.has(socketId)){
         connectedUsers.delete(socketId);
     }
@@ -49,7 +49,7 @@ const getServerSocketInstance=()=>{
 
 module.exports={
     addNewConnectedUser,
-    removeConneted,
+    removeConnetedUser,
     getOnlineUsers,
     getActiveConnections,
     setServerSocketInstance,
