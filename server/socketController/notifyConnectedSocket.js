@@ -4,7 +4,7 @@ const Conversation=require("../models/Conversation")
 const FriendInvitation=require("../models/FriendInvitation")
 const GroupChat=require("../models/GroupChat")
 const {getActiveConnections, getServerSocketInstance}=require("../socket/connectedUsers")
-const {getActiveRooms}=require("../socket/activeRoom")
+const {getActiveRooms}=require("../socket/activeRooms")
 
 
 const updateUsersInvitations=async(userId,isNew)=>{

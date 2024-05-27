@@ -1,4 +1,4 @@
-const {leaveAllRooms}=require("../socket/activeRoom")
+const {leaveAllRooms}=require("../socket/activeRooms")
 const {removeConnetedUser,getOnlineUsers}=require("../socket/connectedUsers")
 const {updateRooms}=require("./notifyConnectedSocket")
 
