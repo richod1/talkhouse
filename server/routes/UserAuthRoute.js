@@ -1,4 +1,5 @@
-const {register,login}=require("../controllers/authController")
+// const {register,login }=require("../controllers/authController")
+const {login,register}=require("../controllers/authController")
 const express=require("express")
 const router=express.Router()
 constJoi=require("joi")
@@ -23,5 +24,22 @@ const loginSchema=Joi.Object({
 router.get("/test",requireAuth,(req,res)=>{
     res.send(`hello, ${req.user.email}`);
 });
+
+// login route
+router.post("/login",validator.body(loginSchema),login);
+// register route
+router.post("/register",validator.body(registerSchema),register);
+
+
+// me {userid route}
+router.get("/me",requireAuth,(req,res)=>{
+    res.status(200).json({
+        me:{
+            _id:req.user.userId,
+            email:req.user.email,
+            username:req.user.username
+        }
+    })
+})
 
 module.exports=router;
