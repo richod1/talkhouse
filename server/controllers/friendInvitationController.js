@@ -46,7 +46,44 @@ const inviteFriend=async(req,res)=>{
 }
 
 
+
+// function for accepting Invitation
+const acceptInvitation=async(req,res)=>{
+    try{
+        const {invitationId}=req.body;
+        const invitation=await FriendInvitation.exists({_id:invitationId});
+        if(!invitation){
+            return res.status(404).send("sorry the invitation you are trying ro accept dosen't exist!")
+        }
+        const deletedInvitation=await FriendInvitation.findByIdAndDelete(invitationId);
+    
+        const sender=await User.findById(deletedInvitation.senderId);
+        const receiver=await User.findById(req.user.userId)
+
+        sender.friends.push(receiver._id);
+        receiver.friends.push(sender._id);
+
+
+        await sender.save();
+        await receiver.save();
+
+        updateUsersInvitations(req.user.userId.toString());
+        updateUsersFriendsList(req.user.userId.toString());
+
+
+        updateUsersFriendsList(deletedInvitation.senderId.toString());
+
+
+        return res.status(200).send("Invitation accepetd successfully!");
+
+    }catch(err){
+        return res.status(500).send("Sorry, something went wrong on the acceptInvitation. Please try again")
+        
+    }
+}
+
 module.exports={
-    inviteFriend
+    inviteFriend,
+    acceptInvitation,
 }
 
