@@ -82,8 +82,31 @@ const acceptInvitation=async(req,res)=>{
     }
 }
 
+// fuinction for invite reject
+const rejectInvitation=async(req,res)=>{
+try{
+    const {invitationId}=req.body;
+
+    const invitation=await FriendInvitation.exists({_id:invitationId})
+    if(!invitation){
+        return res.status(404).send("Sorry, the initation you are trying to jeject dosn't exist")
+    }
+    await FriendInvitation.findByIdAndDelete(invitationId)
+
+    updateUsersInitations(req.user.userId);
+
+    return res.status(200).send("Invitation rejected successfully!");
+
+}catch(err){
+
+    res.status(500).send("Sorry something went wrong at invitation rejection module")
+
+}
+}
+
 module.exports={
     inviteFriend,
     acceptInvitation,
+    rejectInvitation,
 }
 
