@@ -104,9 +104,45 @@ try{
 }
 }
 
+
+const removeFriend =async(req,res)=>{
+    try{
+        const {userId}=req.user;
+        const {friendId}=req.body;
+
+
+        const friend=await User.findOne({_id:friendId});
+        if(!friend){
+            return res.status(404).send(
+                "Sorry the user you are trying to unfriend dosen't exist"
+            )
+        }
+
+        const currentUser=await User.findById(userId);
+
+
+        friend.friends=friend.friends.filter((f)=>f.toString() !==currentUser._id.toString());
+        currentUser.friends=currentUser.friends.filter((f)=>f.toString()!==friend._id.toString());
+
+
+        await friend.save();
+        await currentUser.save();
+
+
+        updateUsersFriendsList(currentUser._id.toString());
+        updateUsersFriendsList(friend._id.toString());
+
+        return res.status(200).send("Friend removed successfully!")
+    }catch(err){
+        return res.status(500).send("Sorry something went wrong removing friend. PLease try again latter")
+
+    }
+}
+
 module.exports={
     inviteFriend,
     acceptInvitation,
     rejectInvitation,
+    removeFriend,
 }
 
